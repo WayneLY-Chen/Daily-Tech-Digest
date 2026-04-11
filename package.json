@@ -1,0 +1,23 @@
+{
+  "name": "daily-tech-digest",
+  "version": "1.0.0",
+  "description": "每日開源科技報自動摘要系統",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "server": "node src/server.js",
+    "test": "vitest --run"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "@supabase/supabase-js": "^2.47.0",
+    "axios": "^1.7.0",
+    "dotenv": "^16.4.0",
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "fast-check": "^3.22.0",
+    "supertest": "^7.2.2",
+    "vitest": "^2.1.0"
+  }
+}
