@@ -27,7 +27,7 @@ export async function fetchHackerNews(sleepFn = sleep) {
   let data;
   try {
     data = await fetchWithRetry(
-      'https://hn.algolia.com/api/v1/search',
+      'https://hn.algolia.com/api/v1/search_by_date',
       {
         tags: 'story',
         query: 'AI OR open source OR machine learning',

@@ -46,7 +46,11 @@ async function fetchReadme(owner, repo, sleepFn = sleep) {
 }
 
 export async function fetchGithubTrending(sleepFn = sleep) {
-  const queries = ['topic:ai language:python', 'topic:machine-learning language:python'];
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const queries = [
+    `topic:ai language:python pushed:>${weekAgo}`,
+    `topic:machine-learning language:python pushed:>${weekAgo}`
+  ];
   const seen = new Set();
   const items = [];
 
@@ -56,7 +60,7 @@ export async function fetchGithubTrending(sleepFn = sleep) {
       data = await fetchWithRetry(
         'https://api.github.com/search/repositories',
         {
-          params: { q, sort: 'stars', order: 'desc', per_page: 10 },
+          params: { q, sort: 'updated', order: 'desc', per_page: 10 },
           headers: {
             Authorization: `Bearer ${config.githubToken}`,
             Accept: 'application/vnd.github+json',
