@@ -1,4 +1,6 @@
 @echo off
+chcp 65001 > nul
+
 title Daily Tech Digest - System Starter
 echo ==========================================
 echo   Step 1: 正在抓取最新技術資料...
