@@ -19,7 +19,7 @@ start "Daily Tech Digest - Frontend" cmd /k "npm run dev"
 echo.
 echo ------------------------------------------
 echo   系統啟動程序已完成。
-echo   [1] 請在另一個視窗查看網頁進度。
-echo   [2] 完成後請訪問: http://localhost:5173
+echo(  - 請在另一個視窗查看網頁進度。
+echo(  - 完成後請訪問: http://localhost:5173
 echo ------------------------------------------
 pause
