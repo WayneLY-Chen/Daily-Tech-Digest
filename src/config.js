@@ -21,4 +21,5 @@ export const config = {
   supabaseUrl: process.env.SUPABASE_URL,
   supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
   githubToken: process.env.GITHUB_TOKEN,
+  maxDailyItems: parseInt(process.env.MAX_DAILY_ITEMS || '10', 10),
 };

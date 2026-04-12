@@ -13,6 +13,7 @@
     - **內建查重機制**：使用 Supabase PostgreSQL 確保內容不重複處理，節省資源。
     - **現代化前端**：基於 Vue 3 與 Vite 打造，支援深色模式。
 - **生產環境就緒**：支援 HTTP POST 端點，可輕鬆整合 n8n、GitHub Actions 或其他排程工具。
+- **自定義抓取數量**：預設每次執行僅處理 **10 篇** 新文章。若需更改，請在 `.env` 中設定 `MAX_DAILY_ITEMS=數量`。
 
 ---
 
@@ -22,6 +23,16 @@
 - **前端 (Frontend)**：Vue 3, Vite, CSS (Glassmorphism 效果)
 - **資料庫 (Database)**：Supabase (PostgreSQL)
 - **AI 引擎**：Google Gemini 2.5 Flash
+
+---
+
+## ⚠️ API 額度與流量限制
+
+本系統使用 **Google Gemini API** 的免費層級 (Free Tier)，因此在使用上有一些限制，請知悉：
+
+1. **429 Too Many Requests**：這是常見的流量限制錯誤。當系統一次處理過多新文章時，可能會觸發此錯誤。目前系統已內建「自動重試機制」，會稍作等待後再次嘗試。
+2. **每日額度限制**：Gemini 免費版有每日調用次數上限。若當天已達到上限，摘要功能將暫時無法使用，需等到隔日恢復。
+3. **付費建議**：若您需要更穩定的體驗或更大量的摘要，建議使用 **Pay-as-you-go** 方案或調低 `MAX_DAILY_ITEMS` 設定。
 
 ---
 

@@ -1,4 +1,5 @@
 import { fetchAll } from './fetcher/index.js';
+import { config } from './config.js';
 import { deduplicate } from './deduplicator/index.js';
 import { summarize } from './summarizer/index.js';
 import { format } from './formatter/index.js';
@@ -10,13 +11,14 @@ export async function run() {
     console.log(`[pipeline] 抓取完成，共 ${fetched.length} 筆`);
 
     const fresh = await deduplicate(fetched);
-    console.log(`[pipeline] 查重完成，新項目 ${fresh.length} 筆`);
+    const limitedFresh = fresh.slice(0, config.maxDailyItems);
+    console.log(`[pipeline] 查重完成，新項目 ${fresh.length} 筆 (本次處理前 ${limitedFresh.length} 筆)`);
 
-    if (fresh.length === 0) {
+    if (limitedFresh.length === 0) {
       return { success: 0, skipped: fetched.length, errors: 0 };
     }
 
-    const rawSummaries = await summarize(fresh);
+    const rawSummaries = await summarize(limitedFresh);
     console.log(`[pipeline] 摘要完成，共 ${rawSummaries.length} 筆`);
 
     const posts = rawSummaries.map(format).filter(Boolean);

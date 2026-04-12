@@ -31,20 +31,38 @@ export async function summarize(items, sleepFn = sleep) {
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
 
-    if (i > 0) await sleepFn(1000);
+    // 每篇文章之間的基本間隔增加至 2 秒
+    if (i > 0) await sleepFn(2000);
 
-    try {
-      const result = await model.generateContent(buildUserPrompt(item));
-      const rawContent = result.response.text();
+    const MAX_RETRIES = 3;
+    let attempt = 0;
+    let success = false;
 
-      if (!rawContent || rawContent.trim() === '') {
-        console.error(`[summarizer] Gemini 回傳空內容，跳過：${item.url}`);
-        continue;
+    while (attempt < MAX_RETRIES && !success) {
+      try {
+        const result = await model.generateContent(buildUserPrompt(item));
+        const rawContent = result.response.text();
+
+        if (!rawContent || rawContent.trim() === '') {
+          console.error(`[summarizer] Gemini 回傳空內容，跳過：${item.url}`);
+          break; // 不重試空內容
+        }
+
+        results.push({ sourceItem: item, rawContent });
+        success = true;
+      } catch (err) {
+        attempt++;
+        const isRateLimit = err.message.includes('429') || err.message.includes('Quota');
+        
+        if (isRateLimit && attempt < MAX_RETRIES) {
+          const waitTime = Math.pow(2, attempt) * 5000; // 10s, 20s...
+          console.warn(`[summarizer] 偵測到流量限制 (429)，正在進行第 ${attempt} 次重試，等待 ${waitTime / 1000} 秒...`);
+          await sleepFn(waitTime);
+        } else {
+          console.error(`[summarizer] API 呼叫失敗 (${item.url})：${err.message}`);
+          break; // 其他錯誤或超過重試次數則放棄
+        }
       }
-
-      results.push({ sourceItem: item, rawContent });
-    } catch (err) {
-      console.error(`[summarizer] API 呼叫失敗，跳過 ${item.url}：${err.message}`);
     }
   }
 
