@@ -1,14 +1,9 @@
-import { createClient } from '@supabase/supabase-js';
-import { config } from '../config.js';
-
-function getClient() {
-  return createClient(config.supabaseUrl, config.supabaseAnonKey);
-}
+import { getServerClient } from '../supabaseClient.js';
 
 export async function deduplicate(items) {
   if (items.length === 0) return [];
 
-  const supabase = getClient();
+  const supabase = getServerClient();
   const urls = items.map((i) => i.url);
 
   const { data, error } = await supabase

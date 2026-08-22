@@ -1,12 +1,9 @@
-import { createClient } from '@supabase/supabase-js';
-import { config } from '../config.js';
-
-function getClient() {
-  return createClient(config.supabaseUrl, config.supabaseAnonKey);
-}
+import { getServerClient } from '../supabaseClient.js';
 
 export async function publish(posts) {
-  const supabase = getClient();
+  // service role client：這兩張表的 RLS 政策是「僅限服務金鑰寫入」，
+  // 用 anon 金鑰的話下面每一筆 insert 都會被擋下來。
+  const supabase = getServerClient();
   const stats = { success: 0, skipped: 0, errors: 0 };
 
   for (const post of posts) {

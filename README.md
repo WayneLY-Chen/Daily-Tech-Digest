@@ -55,7 +55,9 @@ cd frontend && npm install
 ```env
 GEMINI_API_KEY=您的_API_KEY
 SUPABASE_URL=您的_SUPABASE_URL
-SUPABASE_ANON_KEY=您的_SUPABASE_ANON_KEY
+# 注意是 service_role 那一把，不是 anon。後端要寫入資料表，而 RLS 政策限定
+# 服務金鑰才寫得進去；填成 anon 會每一筆都被擋下，啟動時會直接提醒你。
+SUPABASE_SERVICE_ROLE_KEY=您的_SUPABASE_SERVICE_ROLE_KEY
 GITHUB_TOKEN=您的_GITHUB_TOKEN
 # 觸發 POST /run 的共享密鑰。請填一段夠長的隨機字串。
 # 未設定時 /run 會一律回 503（fail-closed），避免這個會燒 API 額度的端點對全網開放。
@@ -67,6 +69,12 @@ RUN_TOKEN=一段夠長的隨機字串
 VITE_SUPABASE_URL=您的_SUPABASE_URL
 VITE_SUPABASE_ANON_KEY=您的_SUPABASE_ANON_KEY
 ```
+
+> [!WARNING]
+> 前端這裡用的是 **anon** 金鑰，它會被打包進瀏覽器、任何人都看得到，
+> 所以只能有「公開讀取」的權限（由 RLS 政策保證）。
+> **絕對不要**把 `service_role` 金鑰放進 `frontend/.env` 或任何 `VITE_` 開頭的
+> 變數——那把金鑰會繞過所有 RLS，等於把資料庫的完整寫入權限公開到網路上。
 
 ### 3. 初始化資料庫
 
