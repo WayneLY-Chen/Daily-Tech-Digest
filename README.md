@@ -57,6 +57,9 @@ GEMINI_API_KEY=您的_API_KEY
 SUPABASE_URL=您的_SUPABASE_URL
 SUPABASE_ANON_KEY=您的_SUPABASE_ANON_KEY
 GITHUB_TOKEN=您的_GITHUB_TOKEN
+# 觸發 POST /run 的共享密鑰。請填一段夠長的隨機字串。
+# 未設定時 /run 會一律回 503（fail-closed），避免這個會燒 API 額度的端點對全網開放。
+RUN_TOKEN=一段夠長的隨機字串
 ```
 
 **前端目錄 `frontend/.env`**：
@@ -108,7 +111,12 @@ CREATE POLICY "僅限服務金鑰寫入 URL" ON processed_urls FOR INSERT WITH C
 
 ### 開發者模式 (CLI)
 - **執行抓取流水線**：`node src/index.js`
-- **啟動 HTTP 伺服器**：`node src/server.js` (透過 POST `/run` 觸發)
+- **啟動 HTTP 伺服器**：`node src/server.js`
+  - 透過 POST `/run` 觸發流水線，需帶 `RUN_TOKEN` 密鑰於 `x-run-token` 標頭；
+    一次只跑一條（併發呼叫會收到 409）。例：
+    ```bash
+    curl -X POST http://localhost:3000/run -H "x-run-token: $RUN_TOKEN"
+    ```
 - **單獨啟動前端**：`cd frontend && npm run dev`
 
 ---
