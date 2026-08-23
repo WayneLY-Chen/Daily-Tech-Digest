@@ -19,11 +19,24 @@
 <script setup>
 import { computed } from 'vue';
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
 const props = defineProps({ post: Object });
 defineEmits(['close']);
 
-const html = computed(() => marked.parse(props.post.content));
+// post.content 不是我們寫的字。它是 Gemini 根據抓回來的 GitHub 專案描述、
+// README（前 3000 字元）與 Hacker News 內文產生的——也就是說，任何人都可以
+// 建一個符合抓取條件的公開 repo，把內容送進這條管線。
+//
+// marked 從 v5 起拿掉了 sanitize 選項，預設把 HTML 原樣輸出（實測 12.0.2：
+// <script>、<img onerror=>、onclick=、javascript: 連結全部照樣通過；只有包在
+// 程式碼區塊裡的才會被逃脫）。原本這裡是 marked.parse() 直接接 v-html，
+// 中間從抓取到寫入資料庫再到這裡，沒有任何一處做過淨化。
+//
+// 這條路會不會被走通，其中一環取決於 Gemini 願不願意照抄 HTML，那不確定；
+// 但「用 v-html 渲染來源不可信的 markdown 而不淨化」本身就是錯的，不需要
+// 先證明某個特定 payload 能穿過模型才值得修。
+const html = computed(() => DOMPurify.sanitize(marked.parse(props.post.content)));
 
 const date = computed(() =>
   new Date(props.post.created_at).toLocaleDateString('zh-TW', {
